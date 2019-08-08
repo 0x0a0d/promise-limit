@@ -81,7 +81,7 @@ class PromiseLimit {
         const queue = async () => {
           await asyncCallBack(array[i], i, array);
           i++;
-          executing.splice(executing.indexOf(e));
+          executing.splice(executing.indexOf(e), 1);
         };
         executing.push(e=queue());
       }
