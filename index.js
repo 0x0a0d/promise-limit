@@ -105,7 +105,7 @@ class PromiseLimit {
    * @return {Promise<*[]>}
    */
   static async for(from, to, limit, asyncCallBack) {
-    if (from < to) throw new Error(`from ${from} must less than to ${to}`);
+    if (from > to) throw new Error(`from ${from} must less than to ${to}`);
     from = correctNumber(from);
     to = correctNumber(to);
     limit = correctLimit(limit);
