@@ -111,21 +111,26 @@ class PromiseLimit {
     limit = correctLimit(limit);
     if (!this.isWarningMessageDisabled()) checkAsyncCallback(asyncCallBack);
 
-    const result = {};
+    const result_obj = {};
     const executing = [];
-    while (from <= to) {
-      while (from <= to && executing.length < limit) {
+    let i = from;
+    while (i <= to) {
+      while (i <= to && executing.length < limit) {
         let e;
         const queue = async (index) => {
-          result[index] = await asyncCallBack(index);
+          result_obj[index] = await asyncCallBack(index);
           executing.splice(executing.indexOf(e), 1);
         };
-        executing.push(e=queue(from++));
+        executing.push(e=queue(i++));
       }
       await Promise.race(executing);
     }
     await Promise.all(executing);
-    return Object.keys(result).sort().map(index=>result[index]);
+    const result_list = [];
+    for (i = from; i <= to; i ++) {
+      result_list.push(result_obj[i]);
+    }
+    return result_list;
   }
 }
 
