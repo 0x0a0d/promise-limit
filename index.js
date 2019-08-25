@@ -13,7 +13,13 @@ function checkAsyncCallback(asyncCallback) {
     console.warn(`callback should be an AsyncFunction, you could also return a pending Promise too. If that, just ignore this message or call PromiseLimit.disableWarningMessage(true)`);
   }
 }
-
+function correctNumber(num) {
+  if (typeof num !== 'number') {
+    num = parseInt(num);
+  }
+  if (isNaN(num)) throw new Error(`require number ${num}`);
+  return num;
+}
 class PromiseLimit {
   /**
    * hide warning when validate asyncCallback
@@ -34,7 +40,7 @@ class PromiseLimit {
    * @param {Array} array
    * @param {number} limit
    * @param {Function} asyncCallBack
-   * @return {Promise<[*]>}
+   * @return {Promise<*[]>}
    */
   static async map(array, limit, asyncCallBack) {
     array = correctArray(array);
@@ -88,6 +94,38 @@ class PromiseLimit {
       await Promise.race(executing);
     }
     await Promise.all(executing);
+  }
+
+  /**
+   * for loop
+   * @param {number} from
+   * @param {number} to
+   * @param {number} limit
+   * @param {Function} asyncCallBack
+   * @return {Promise<*[]>}
+   */
+  static async for(from, to, limit, asyncCallBack) {
+    if (from < to) throw new Error(`from ${from} must less than to ${to}`);
+    from = correctNumber(from);
+    to = correctNumber(to);
+    limit = correctLimit(limit);
+    if (!this.isWarningMessageDisabled()) checkAsyncCallback(asyncCallBack);
+
+    const result = {};
+    const executing = [];
+    while (from <= to) {
+      while (from <= to && executing.length < limit) {
+        let e;
+        const queue = async (index) => {
+          result[index] = await asyncCallBack(index);
+          executing.splice(executing.indexOf(e), 1);
+        };
+        executing.push(e=queue(from++));
+      }
+      await Promise.race(executing);
+    }
+    await Promise.all(executing);
+    return Object.keys(result).sort().map(index=>result[index]);
   }
 }
 
