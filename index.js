@@ -132,6 +132,20 @@ class PromiseLimit {
     }
     return result_list;
   }
+  static async forever(asyncDelayAndCondition, asyncGenerator, limit, asyncCallback) {
+    const executing = [];
+    do {
+      while (executing.length < limit) {
+        let e;
+        const queue = async (data) => {
+          await asyncCallback(data);
+          executing.splice(executing.indexOf(e), 1);
+        };
+        executing.push(e=queue(await asyncGenerator()));
+      }
+      await Promise.race(executing);
+    } while (await asyncDelayAndCondition());
+  }
 }
 
 module.exports = PromiseLimit;
