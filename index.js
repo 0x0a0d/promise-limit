@@ -134,8 +134,10 @@ class PromiseLimit {
   }
   static async forever(asyncDelayAndCondition, asyncGenerator, limit, asyncCallback) {
     const executing = [];
+    let i;
     do {
-      while (executing.length < limit) {
+      i = executing.length
+      while (i++ < limit) {
         let e;
         const queue = async (data) => {
           await asyncCallback(data);
