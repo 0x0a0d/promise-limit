@@ -84,12 +84,11 @@ class PromiseLimit {
     while (array.length > i) {
       while (executing.length < limit && array.length > i) {
         let e;
-        const index = i++;
-        const queue = async () => {
+        const queue = async (index) => {
           await asyncCallBack(array[index], index, array);
           executing.splice(executing.indexOf(e), 1);
         };
-        executing.push(e=queue());
+        executing.push(e=queue(i++));
       }
       await Promise.race(executing);
     }
