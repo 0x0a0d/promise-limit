@@ -8,11 +8,6 @@ function correctLimit(limit) {
   if (isNaN(limit) || limit <= 0) throw new Error(`Limit must be a number and greater than 0`);
   return limit;
 }
-function checkAsyncCallback(asyncCallback) {
-  if (asyncCallback.constructor.name !== 'AsyncFunction') {
-    console.warn(`callback should be an AsyncFunction, you could also return a pending Promise too. If that, just ignore this message or call PromiseLimit.disableWarningMessage(true)`);
-  }
-}
 function correctNumber(num) {
   if (typeof num !== 'number') {
     num = parseInt(num);
@@ -22,30 +17,15 @@ function correctNumber(num) {
 }
 class PromiseLimit {
   /**
-   * hide warning when validate asyncCallback
-   * @param {Boolean} bool
-   * @return {this}
-   */
-  static disableWarningMessage(bool) {
-    /**@private*/
-    this.hide_warning_message = bool === true;
-    return this;
-  }
-  /**@private*/
-  static isWarningMessageDisabled() {
-    return this.hide_warning_message === true;
-  }
-  /**
    * loop and get result
    * @param {Array} array
    * @param {number} limit
-   * @param {Function} asyncCallBack
+   * @param {Function} iterator
    * @return {Promise<*[]>}
    */
-  static async map(array, limit, asyncCallBack) {
+  static async map(array, limit, iterator) {
     array = correctArray(array);
     limit = correctLimit(limit);
-    if (!this.isWarningMessageDisabled()) checkAsyncCallback(asyncCallBack);
     const executing = [];
     const result = {};
     let i = 0;
@@ -54,12 +34,12 @@ class PromiseLimit {
         let e;
         const index = i++;
         const queue = async () => {
-          result[index] = await asyncCallBack(array[index], index, array);
+          result[index] = await Promise.resolve(iterator(array[index], index, array));
           executing.splice(executing.indexOf(e), 1);
         };
         executing.push(e=queue());
       }
-      await Promise.race(executing);
+      executing.length && await Promise.race(executing);
     }
     await Promise.all(executing);
     const result_list = [];
@@ -69,28 +49,27 @@ class PromiseLimit {
     return result_list;
   }
   /**
-   * loop
+   * loop forEach
    * @param {Array} array
    * @param {number} limit
-   * @param {Function} asyncCallBack
+   * @param {Function} iterator
    * @return {Promise<void>}
    */
-  static async forEach(array, limit, asyncCallBack) {
+  static async forEach(array, limit, iterator) {
     array = correctArray(array);
     limit = correctLimit(limit);
-    if (!this.isWarningMessageDisabled()) checkAsyncCallback(asyncCallBack);
     const executing = [];
     let i = 0;
     while (array.length > i) {
       while (executing.length < limit && array.length > i) {
         let e;
         const queue = async (index) => {
-          await asyncCallBack(array[index], index, array);
+          await Promise.resolve(iterator(array[index], index, array));
           executing.splice(executing.indexOf(e), 1);
         };
         executing.push(e=queue(i++));
       }
-      await Promise.race(executing);
+      executing.length && await Promise.race(executing);
     }
     await Promise.all(executing);
   }
@@ -100,15 +79,15 @@ class PromiseLimit {
    * @param {number} from
    * @param {number} to
    * @param {number} limit
-   * @param {Function} asyncCallBack
+   * @param {Function} iterator
+   * @param {Boolean} returnResult
    * @return {Promise<*[]>}
    */
-  static async for(from, to, limit, asyncCallBack) {
-    if (from > to) throw new Error(`from ${from} must less than to ${to}`);
+  static async for(from, to, limit, iterator, returnResult = false) {
     from = correctNumber(from);
     to = correctNumber(to);
+    if (from > to) throw new Error(`from '${from}' must less than to '${to}'`);
     limit = correctLimit(limit);
-    if (!this.isWarningMessageDisabled()) checkAsyncCallback(asyncCallBack);
 
     const result_obj = {};
     const executing = [];
@@ -117,33 +96,48 @@ class PromiseLimit {
       while (i <= to && executing.length < limit) {
         let e;
         const queue = async (index) => {
-          result_obj[index] = await asyncCallBack(index);
+          const result = await Promise.resolve(iterator(index));
+          if (returnResult)
+            result_obj[index] = result
           executing.splice(executing.indexOf(e), 1);
         };
         executing.push(e=queue(i++));
       }
-      await Promise.race(executing);
+      executing.length && await Promise.race(executing);
     }
     await Promise.all(executing);
-    const result_list = [];
-    for (i = from; i <= to; i ++) {
-      result_list.push(result_obj[i]);
+    if (returnResult) {
+      const result_list = [];
+      for (i = from; i <= to; i++) {
+        result_list.push(result_obj[i]);
+      }
+      return result_list;
     }
-    return result_list;
   }
-  static async forever(asyncDelayAndCondition, asyncGenerator, limit, asyncCallback) {
+
+  /**
+   * loop until conditionFunc return falsy
+   * @param {Function} conditionFunc
+   * @param {Function} generatorFunc
+   * @param {number} limit
+   * @param {Function} iterator
+   * @return {Promise<void>}
+   */
+  static async until(conditionFunc, generatorFunc, limit, iterator) {
     const executing = [];
     do {
       while (executing.length < limit) {
         let e;
-        const queue = async (data) => {
-          await asyncCallback(data);
-          executing.splice(executing.indexOf(e), 1);
+        const queue = async (func) => {
+          func.then(async data => {
+            await Promise.resolve(iterator(data));
+            executing.splice(executing.indexOf(e), 1);
+          })
         };
-        executing.push(e=queue(await asyncGenerator()));
+        executing.push(e = queue(Promise.resolve(generatorFunc())));
       }
-      await Promise.race(executing);
-    } while (await asyncDelayAndCondition());
+      executing.length && await Promise.race(executing);
+    } while (await Promise.resolve(conditionFunc()));
     await Promise.all(executing);
   }
 }
