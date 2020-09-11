@@ -130,10 +130,11 @@ class PromiseLimit {
       while (executing.length < limit) {
         let e;
         const queue = async (func) => {
-          func.then(async data => {
-            await Promise.resolve(iterator(data));
-            executing.splice(executing.indexOf(e), 1);
-          })
+          return func
+            .then(data => Promise.resolve(iterator(data)))
+            .finally(() => {
+              executing.splice(executing.indexOf(e), 1)
+            })
         };
         executing.push(e = queue(Promise.resolve(generatorFunc(params))));
       }
