@@ -121,9 +121,10 @@ class PromiseLimit {
    * @param {Function} generatorFunc
    * @param {number} limit
    * @param {Function} iterator
+   * @param {*|null} params
    * @return {Promise<void>}
    */
-  static async until(conditionFunc, generatorFunc, limit, iterator) {
+  static async until(conditionFunc, generatorFunc, limit, iterator, params) {
     const executing = [];
     do {
       while (executing.length < limit) {
@@ -134,10 +135,10 @@ class PromiseLimit {
             executing.splice(executing.indexOf(e), 1);
           })
         };
-        executing.push(e = queue(Promise.resolve(generatorFunc())));
+        executing.push(e = queue(Promise.resolve(generatorFunc(params))));
       }
       executing.length && await Promise.race(executing);
-    } while (await Promise.resolve(conditionFunc()));
+    } while (await Promise.resolve(conditionFunc(params)));
     await Promise.all(executing);
   }
 }

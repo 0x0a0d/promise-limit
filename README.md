@@ -19,10 +19,11 @@ like PromiseLimit.map but doesn't return result
 * to: number
 loop from 'from' to 'to', value will be sent to iterator, if you wanna get results, you must set `returnResult=true`
 
-##### PromiseLimit.until(conditionFunc, generatorFunc, limit, iterator)
+##### PromiseLimit.until(conditionFunc, generatorFunc, limit, iterator, [conditionAndGeneratorParams])
 
 * conditionFunc: until conditionFunction return falsy, the loop will stop
 * generatorFunc: each loop round, iterator will receive value return from this function
+* conditionAndGeneratorParams: will pass to condition & generator each loop
 
 ##### example
 ```js
