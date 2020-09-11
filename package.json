@@ -1,6 +1,6 @@
 {
   "name": "promise-limit-loop",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "promise limit loop",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,11 @@
     "type": "git",
     "url": "https://github.com/0x0a0d/promise-limit"
   },
-  "keywords": ["promise", "limit", "loop"],
+  "keywords": [
+    "promise",
+    "limit",
+    "loop"
+  ],
   "author": "0x0a0d",
   "license": "ISC"
 }
