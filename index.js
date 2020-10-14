@@ -124,7 +124,7 @@ class PromiseLimit {
    * @param {*|null} [params=null]
    * @return {Promise<void>}
    */
-  static async until(conditionFunc, generatorFunc, limit, iterator, params) {
+  static async until(conditionFunc, generatorFunc, limit, iterator, params = null) {
     const executing = [];
     do {
       while (executing.length < limit) {
