@@ -121,7 +121,7 @@ class PromiseLimit {
    * @param {Function} generatorFunc
    * @param {number} limit
    * @param {Function} iterator
-   * @param {*|null} params
+   * @param {*|null} [params=null]
    * @return {Promise<void>}
    */
   static async until(conditionFunc, generatorFunc, limit, iterator, params) {
