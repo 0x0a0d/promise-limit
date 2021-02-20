@@ -124,7 +124,7 @@ class PromiseLimit {
    * @param {*|null} [params=null]
    * @return {Promise<void>}
    */
-  static async until(conditionFunc, generatorFunc, limit, iterator, params = null) {
+  static async doWhile(conditionFunc, generatorFunc, limit, iterator, params = null) {
     const executing = [];
     do {
       while (executing.length < limit) {
@@ -140,6 +140,34 @@ class PromiseLimit {
       }
       executing.length && await Promise.race(executing);
     } while (await Promise.resolve(conditionFunc(params)));
+    await Promise.all(executing);
+  }
+
+  /**
+   * loop until conditionFunc return falsy
+   * @param {Function} conditionFunc
+   * @param {Function} generatorFunc
+   * @param {number} limit
+   * @param {Function} iterator
+   * @param {*|null} [params=null]
+   * @return {Promise<void>}
+   */
+  static async while(conditionFunc, generatorFunc, limit, iterator, params = null) {
+    const executing = [];
+    while (await Promise.resolve(conditionFunc(params))) {
+      while (executing.length < limit) {
+        let e;
+        const queue = async (func) => {
+          return func
+            .then(data => Promise.resolve(iterator(data)))
+            .finally(() => {
+              executing.splice(executing.indexOf(e), 1)
+            })
+        };
+        executing.push(e = queue(Promise.resolve(generatorFunc(params))));
+      }
+      executing.length && await Promise.race(executing);
+    }
     await Promise.all(executing);
   }
 }

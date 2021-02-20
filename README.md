@@ -19,9 +19,15 @@ like PromiseLimit.map but doesn't return result
 * to: number
 loop from 'from' to 'to', value will be sent to iterator, if you wanna get results, you must set `returnResult=true`
 
-##### PromiseLimit.until(conditionFunc, generatorFunc, limit, iterator, [conditionAndGeneratorParams])
+##### PromiseLimit.while(conditionFunc, generatorFunc, limit, iterator, [conditionAndGeneratorParams])
 
-* conditionFunc: until conditionFunction return falsy, the loop will stop
+* conditionFunc: while conditionFunction return truly, the loop will continue executing
+* generatorFunc: each loop round, iterator will receive value return from this function
+* conditionAndGeneratorParams: will pass to condition & generator each loop
+
+##### PromiseLimit.~~until~~`doWhile`(conditionFunc, generatorFunc, limit, iterator, [conditionAndGeneratorParams])
+
+* conditionFunc: execute the loop, until the conditionFunc return falsy
 * generatorFunc: each loop round, iterator will receive value return from this function
 * conditionAndGeneratorParams: will pass to condition & generator each loop
 
@@ -70,7 +76,7 @@ f 3020
 */
 
 let i = 0
-PromiseLimitLoop.until(
+PromiseLimitLoop.doWhile(
   async function condition () {
     return new Promise(resolve => setTimeout(() => {
       resolve(Date.now() - start < 3e3) // stop if 3 sec passed
