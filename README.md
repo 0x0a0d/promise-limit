@@ -4,33 +4,44 @@
 
 this package support loop with promise, you dont need to create an array of pending promise before executing
 
-##### PromiseLimit.map(array, limit, iterator)
+##### PromiseLimitLoop.map(array, limit, iterator)
 this method loop all values in array, send them to iterator (params of iterator like array.map)
 
 * array: an array like [1,2,3,4]
 * limit: limit promise executed at same time
 * iterator: receive and process value
-##### PromiseLimit.forEach(array, limit, iterator)
-like PromiseLimit.map but doesn't return result
+##### PromiseLimitLoop.forEach(array, limit, iterator)
+like PromiseLimitLoop.map but doesn't return result
 
-##### PromiseLimit.for(from, to, limit, iterator, returnResult = false)
+##### PromiseLimitLoop.for(from, to, limit, iterator, step = 1)
 
 * from: number
 * to: number
-loop from 'from' to 'to', value will be sent to iterator, if you wanna get results, you must set `returnResult=true`
+* step: number
 
-##### PromiseLimit.while(conditionFunc, generatorFunc, limit, iterator, [conditionAndGeneratorParams])
+loop from 'from' to 'to', value will be sent to iterator
+> If `step > 0`, `from` must less than `to`
 
-* conditionFunc: while conditionFunction return truly, the loop will continue executing
+> If `step < 0`, `from` must greater than `to`
+
+##### PromiseLimitLoop.while(conditionFunc, generatorFunc, limit, iterator, [generatorParams])
+
+* conditionFunc(*): while conditionFunction return truly, the loop will continue executing
 * generatorFunc: each loop round, iterator will receive value return from this function
-* conditionAndGeneratorParams: will pass to condition & generator each loop
+* generatorParams: will pass to generator each loop
 
-##### PromiseLimit.~~until~~`doWhile`(conditionFunc, generatorFunc, limit, iterator, [conditionAndGeneratorParams])
+##### ~~PromiseLimitLoop.until~~ use `PromiseLimitLoop.doWhile`
+##### PromiseLimitLoop.doWhile(conditionFunc, generatorFunc, limit, iterator, [generatorParams])
 
-* conditionFunc: execute the loop, until the conditionFunc return falsy
+* conditionFunc(*): execute the loop, until the conditionFunc return falsy
 * generatorFunc: each loop round, iterator will receive value return from this function
-* conditionAndGeneratorParams: will pass to condition & generator each loop
+* generatorParams: will pass to generator each loop
 
+> conditionFunc(*): pushing generatorFunc to Queue will execute conditionFunc to validate.
+> 
+> `PromiseLimitLoop.doWhile`: execute after pushing
+>
+> `PromiseLimitLoop.while`: execute before pushing
 ##### example
 ```js
 const PromiseLimitLoop = require('promise-limit-loop')
