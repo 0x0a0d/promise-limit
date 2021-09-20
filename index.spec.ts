@@ -85,15 +85,4 @@ describe('PromiseLimitLoop', () => {
     }, 3)
     expect(arr).toEqual([3, 5, 7, 9, 11, 13, 15, 17, 19, 21])
   })
-  it('test', async() => {
-    const start = Date.now()
-    await PromiseLimitLoop.for(0, 10, 2, async function(i) {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          console.log(i, Date.now() - start)
-          resolve()
-        }, 100)
-      })
-    })
-  })
 })
