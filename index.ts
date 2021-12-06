@@ -1,10 +1,10 @@
 import { ensureLimit, getOrderResults } from './src/utils'
 
-type FunctionIterator<R = any, T = any> = (item: T, index: number, items: T[]) => R | Promise<R>
-type FunctionIndexIterator = (index: number) => void | Promise<void>
-type FunctionCondition = () => boolean | Promise<boolean>
-type FunctionGenerator<R = any, P = any> = (params?: P) => R | Promise<R>
-type FunctionWhileIterator<R = any> = (resolvedFromGenerator: R) => void | Promise<void>
+type FunctionIterator<R = any, T = any> = (item: T, index: number, items: T[])=> R | Promise<R>
+type FunctionIndexIterator = (index: number)=> void | Promise<void>
+type FunctionCondition = ()=> boolean | Promise<boolean>
+type FunctionGenerator<R = any, P = any> = (params?: P)=> R | Promise<R>
+type FunctionWhileIterator<R = any> = (resolvedFromGenerator: R)=> void | Promise<void>
 
 const PromiseLimitLoop = {
   async map<R = any, T = any>(items: T[], limit: number, iterator: FunctionIterator<R, (typeof items)[number]>): Promise<R[]> {
@@ -13,7 +13,7 @@ const PromiseLimitLoop = {
     const executing: Promise<void>[] = []
     const results: {[k: string]: R} = {}
 
-    let i: number = 0
+    let i = 0
     while (items.length > i) {
       while (executing.length < limit && items.length > i) {
         let e: Promise<void>
@@ -37,7 +37,7 @@ const PromiseLimitLoop = {
 
     const executing: Promise<void>[] = []
 
-    let i: number = 0
+    let i = 0
     while (items.length > i) {
       while (executing.length < limit && items.length > i) {
         let e: Promise<void>
@@ -53,7 +53,7 @@ const PromiseLimitLoop = {
     await Promise.all(executing)
   },
 
-  async for(from: number, to: number, limit: number, iterator: FunctionIndexIterator, step: number = 1): Promise<void> {
+  async for(from: number, to: number, limit: number, iterator: FunctionIndexIterator, step = 1): Promise<void> {
     limit = ensureLimit(limit)
 
     const executing: Promise<void>[] = []

@@ -1,5 +1,5 @@
-export const ensureLimit = (limit: any, min: number = 0): number => {
-  limit = parseInt(limit)
+export const ensureLimit = (limit: number, min = 0): number => {
+  limit = parseInt(limit as any)
   if (isNaN(limit) || limit <= min) {
     throw new Error(`Limit must be a number and greater than ${min}`)
   }
