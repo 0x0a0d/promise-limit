@@ -3,8 +3,10 @@ import { ensureLimit, getOrderResults } from './utils'
 describe('Utils test', () => {
   it('ensureLimit', () => {
     expect(ensureLimit(1)).toBe(1)
+    // @ts-ignore
     expect(ensureLimit('1')).toBe(1)
     expect(ensureLimit(1.5)).toBe(1)
+    // @ts-ignore
     expect(ensureLimit('1.5')).toBe(1)
     expect(() => ensureLimit(-1.5)).toThrowError('Limit must be a number and greater than 0')
     expect(() => ensureLimit(-1.5, -1)).toThrowError('Limit must be a number and greater than -1')
