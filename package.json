@@ -1,6 +1,6 @@
 {
   "name": "promise-limit",
-  "version": "1.0.0",
+  "version": "3.0.0-2",
   "description": "promise limit loop",
   "main": "dist/index.js",
   "scripts": {
@@ -30,8 +30,8 @@
     "dist"
   ],
   "devDependencies": {
-    "@cylution/eslint-config-nodejs": "^1.0.12",
-    "@types/jest": "^27.0.3",
+    "@cylution/eslint-config-nodejs": "^1.0.15",
+    "@types/jest": "^27.4.1",
     "@types/node": "^16.11.11",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",

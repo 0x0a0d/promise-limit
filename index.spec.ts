@@ -88,7 +88,7 @@ describe('PromiseLimitLoop', () => {
   it('test', async() => {
     const start = Date.now()
     await PromiseLimitLoop.for(0, 10, 2, async function(i) {
-      return new Promise(resolve => {
+      return new Promise<void>(resolve => {
         setTimeout(() => {
           console.log(i, Date.now() - start)
           resolve()
