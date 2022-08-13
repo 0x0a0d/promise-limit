@@ -1,10 +1,10 @@
 import { ensureLimit, getOrderResults } from './src/utils'
 
-type FunctionIterator<R = any, T = any> = (item: T, index: number, items: T[]) => R | Promise<R>
-type FunctionIndexIterator = (index: number) => any | Promise<any>
-type FunctionCondition = () => boolean | Promise<boolean>
-type FunctionGenerator<R = any, P = any> = (params?: P) => R | Promise<R>
-type FunctionWhileIterator<R = any> = (resolvedFromGenerator: R) => any | Promise<any>
+type FunctionIterator<R = any, T = any> = (item: T, index: number, items: T[])=> R | Promise<R>
+type FunctionIndexIterator = (index: number)=> any | Promise<any>
+type FunctionCondition = ()=> boolean | Promise<boolean>
+type FunctionGenerator<R = any, P = any> = (params?: P)=> R | Promise<R>
+type FunctionWhileIterator<R = any> = (resolvedFromGenerator: R)=> any | Promise<any>
 
 const PromiseLimitLoop = {
   async map<R = any, T = any>(items: T[], limit: number, iterator: FunctionIterator<R, (typeof items)[number]>): Promise<R[]> {

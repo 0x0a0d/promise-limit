@@ -30,12 +30,12 @@
     "dist"
   ],
   "devDependencies": {
-    "@cylution/eslint-config-nodejs": "^1.0.15",
+    "@cylution/eslint-config-nodejs": "^2.0.1",
     "@types/jest": "^27.4.1",
     "@types/node": "^16.11.11",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "eslint": "^7.32.0",
+    "@typescript-eslint/eslint-plugin": "^5.33.0",
+    "@typescript-eslint/parser": "^5.33.0",
+    "eslint": "^8.21.0",
     "jest": "^27.4.3",
     "ts-jest": "^27.1.0",
     "ts-node": "^10.4.0",
