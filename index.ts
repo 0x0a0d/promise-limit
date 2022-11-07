@@ -96,6 +96,7 @@ const PromiseLimitLoop = {
         executing.length && await Promise.race(executing)
       }
     }
+    await Promise.all(executing)
   },
 
   async doWhile<R = any, P = any>(conditionFunc: FunctionCondition, generatorFunc: FunctionGenerator<R, P>, limit: number, iterator: FunctionWhileIterator<R>, generatorParams?: P): Promise<void> {
