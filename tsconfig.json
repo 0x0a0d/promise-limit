@@ -9,7 +9,7 @@
     "pretty": false,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "target": "es6",
+    "target": "ESNext",
     "lib": ["es6"],
     "declaration": true,
 //     "outDir": "dist",

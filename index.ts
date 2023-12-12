@@ -140,4 +140,4 @@ const PromiseLimitLoop = {
   },
 }
 
-export = PromiseLimitLoop
+export default PromiseLimitLoop
