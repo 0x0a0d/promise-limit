@@ -5,7 +5,10 @@ type FunctionIndexIterator = (index: number)=> any | Promise<any>
 type FunctionCondition = ()=> boolean | Promise<boolean>
 type FunctionGenerator<R = any, P = any> = (params?: P)=> R | Promise<R>
 type FunctionWhileIterator<R = any> = (resolvedFromGenerator: R)=> any | Promise<any>
-type FunctionParallelIterator = (handleLimit: (increaseOrDecrease?: number)=> void, executionTime: number)=> any | Promise<any>
+declare function HandleLimit(): number
+declare function HandleLimit(increaseOrDecrease: number): void
+declare function HandleLimit(increaseOrDecrease?: number): void | number
+type FunctionParallelIterator = (handleLimit: typeof HandleLimit, executionTime: number)=> any | Promise<any>
 
 const PromiseLimitLoop = {
   /**
