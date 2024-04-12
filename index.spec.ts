@@ -32,8 +32,8 @@ describe('PromiseLimitLoop', () => {
     }, -2)).toBeUndefined()
     expect(back.sort()).toEqual([1, 3, 5, 7, 9])
 
-    await expect(PromiseLimitLoop.for(1, 2, 2, () => {}, -1)).rejects.toThrow(`from '1' can not less than to '2'`)
-    await expect(PromiseLimitLoop.for(2, 1, 2, () => {}, 1)).rejects.toThrow(`from '2' can not greater than to '1'`)
+    await expect(PromiseLimitLoop.for(1, 2, 2, () => { /**/ }, -1)).rejects.toThrow(`from '1' can not less than to '2'`)
+    await expect(PromiseLimitLoop.for(2, 1, 2, () => { /**/ }, 1)).rejects.toThrow(`from '2' can not greater than to '1'`)
   })
   it('doWhile', async() => {
     let i = 0
@@ -95,5 +95,20 @@ describe('PromiseLimitLoop', () => {
         }, 100)
       })
     })
+  })
+  it('parallel', async() => {
+    const start = Date.now()
+    let timeAnchor = 1e3
+    const results = []
+    await PromiseLimitLoop.parallel(2, async(handleLimit, executionTime) => {
+      await new Promise(resolve => setTimeout(resolve, 100))
+      const time = Date.now() - start
+      results.push([executionTime, time])
+      if (time > timeAnchor) {
+        timeAnchor += 1e3
+        handleLimit(-1)
+      }
+    })
+    expect(results[results.length - 1][1] > 2e3).toBeTruthy()
   })
 })
