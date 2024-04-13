@@ -5,10 +5,8 @@ type FunctionIndexIterator = (index: number)=> any | Promise<any>
 type FunctionCondition = ()=> boolean | Promise<boolean>
 type FunctionGenerator<R = any, P = any> = (params?: P)=> R | Promise<R>
 type FunctionWhileIterator<R = any> = (resolvedFromGenerator: R)=> any | Promise<any>
-declare function HandleLimit(): number
-declare function HandleLimit(increaseOrDecrease: number): void
-declare function HandleLimit(increaseOrDecrease?: number): void | number
-type FunctionParallelIterator = (handleLimit: typeof HandleLimit, executionTime: number)=> any | Promise<any>
+declare function HandleLimit(increaseOrDecrease?: number, directlySetToLimit?: boolean): number
+type FunctionParallelIterator = (handleLimit: typeof HandleLimit)=> any | Promise<any>
 
 const PromiseLimitLoop = {
   /**
@@ -172,23 +170,33 @@ const PromiseLimitLoop = {
   /**
    * execute parallelFunc in parallel with limit of execution
    * - limit: number of execution in parallel
-   * - parallelFunc: function that receive function `handleLimit` to change limit of execution, and `executionTime` as current number of execution
-   * - handleLimit: If you want to add more execution, call the function with positive number, otherwise call with negative number. If you call `handleLimit` with no parameter, it will return current limit. The execution will stop if `limit` is less than or equal to 0
+   * - parallelFunc: function that receive function `handleLimit` to change limit of execution, and `directlySetToLimit` to set limit directly (ignore counting)
+   * - handleLimit: If you want to add more execution, call the function with positive number, otherwise call with negative number. If you call `handleLimit` with non or null parameter, it will return current limit. The execution will stop if `limit` is less than or equal to 0
    */
   async parallel(limit: number, parallelFunc: FunctionParallelIterator) {
     limit = ensureLimit(limit)
 
     const executing: any[] = []
-    const handleLimit = (increaseOrDecrease?: number) => {
-      if (increaseOrDecrease == null) return limit
+    const handleLimit = (increaseOrDecrease?: number, directlySetToLimit?: boolean) => {
+      if (directlySetToLimit) {
+        if (typeof increaseOrDecrease !== 'number' || isNaN(increaseOrDecrease)) {
+          throw new Error('limit must be a number')
+        }
+        limit = increaseOrDecrease
+        return limit
+      }
+      if (!increaseOrDecrease) return limit
+      if (typeof increaseOrDecrease !== 'number' || isNaN(increaseOrDecrease)) {
+        throw new Error('limit must be a number')
+      }
       limit += increaseOrDecrease
+      return limit
     }
 
-    let executionTime = 0
     while (executing.length < limit) {
       let e: any
       const queue = async() => {
-        return Promise.resolve(parallelFunc(handleLimit, executionTime++)).finally(() => {
+        return Promise.resolve(parallelFunc(handleLimit)).finally(() => {
           executing.splice(executing.indexOf(e), 1)
         })
       }

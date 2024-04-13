@@ -4,7 +4,10 @@
   "description": "promise limit loop",
   "main": "index.js",
   "scripts": {
-    "prepack": "tsc"
+    "test": "jest",
+    "prepack": "rm -rf dist; npm run build:clean; tsc -p tsconfig.prod.json",
+    "build:clean": "tsc --build --clean",
+    "postpublish": "npm run build:clean"
   },
   "repository": {
     "type": "git",

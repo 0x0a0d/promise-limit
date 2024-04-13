@@ -43,9 +43,14 @@ loop from 'from' to 'to', value will be sent to iterator
 >
 > `PromiseLimitLoop.while`: execute before pushing
 
-##### PromiseLimitLoop.parallel((handleLimit: (increaseOrDecrease?: number)=> void, executionTime: number))
+##### PromiseLimitLoop.parallel((handleLimit: (increaseOrDecrease?: number, directlySetToLimit?: boolean)=> number))
 
-* handleLimit: increase or decrease limit of promise executing. If no params, return current limit
+* handleLimit: increase or decrease limit of promise executing. If pass non or null params, return current limit. To set limit directly, pass second param as true
+```js
+PromiseLimitLoop.parallel(10, async (handleLimit) => {
+  handleLimit(0, true) // set limit to 0 to force stop
+})
+```
 * executionTime: the current total time of executing promise
 * Call `handleLimit(-1)` will decrease limit by 1, and increase limit by 1 if call `handleLimit(1)`
 * If the limit is 0 or negative, the promise will be executed immediately

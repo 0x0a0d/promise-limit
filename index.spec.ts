@@ -96,19 +96,41 @@ describe('PromiseLimitLoop', () => {
       })
     })
   })
-  it('parallel', async() => {
-    const start = Date.now()
-    let timeAnchor = 1e3
-    const results = []
-    await PromiseLimitLoop.parallel(2, async(handleLimit, executionTime) => {
-      await new Promise(resolve => setTimeout(resolve, 100))
-      const time = Date.now() - start
-      results.push([executionTime, time])
-      if (time > timeAnchor) {
-        timeAnchor += 1e3
-        handleLimit(-1)
-      }
+  describe('parallel', () => {
+    it('execution', async() => {
+      const start = Date.now()
+      let timeAnchor = 1e3
+      const results = []
+      let limit = 2
+      await PromiseLimitLoop.parallel(limit, async(handleLimit) => {
+        await new Promise(resolve => setTimeout(resolve, 100))
+        const time = Date.now() - start
+        results.push(time)
+        if (time > timeAnchor) {
+          timeAnchor += 1e3
+          handleLimit(-1)
+          limit = handleLimit()
+        }
+      })
+      expect(results[results.length - 1] > 2e3).toBeTruthy()
+      expect(limit).toBe(0)
     })
-    expect(results[results.length - 1][1] > 2e3).toBeTruthy()
+    it('change limit', async() => {
+      const tests = [
+        [2, 3],
+        [-1, 2],
+        [null, 2],
+      ]
+      expect.assertions(3)
+      await PromiseLimitLoop.parallel(1, async(handleLimit) => {
+        if (!tests.length) {
+          handleLimit(0, true)
+          return
+        }
+        const [change, expectLimit] = tests.shift()
+        const limit = handleLimit(change)
+        expect(limit).toBe(expectLimit)
+      })
+    })
   })
 })
