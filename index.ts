@@ -193,14 +193,16 @@ const PromiseLimitLoop = {
       return limit
     }
 
-    while (executing.length < limit) {
-      let e: any
-      const queue = async() => {
-        return Promise.resolve(parallelFunc(handleLimit)).finally(() => {
-          executing.splice(executing.indexOf(e), 1)
-        })
+    while (limit > 0) {
+      while (executing.length < limit) {
+        let e: any
+        const queue = async() => {
+          return Promise.resolve(parallelFunc(handleLimit)).finally(() => {
+            executing.splice(executing.indexOf(e), 1)
+          })
+        }
+        executing.push(e = queue())
       }
-      executing.push(e = queue())
       executing.length && await Promise.race(executing)
     }
     await Promise.all(executing)
