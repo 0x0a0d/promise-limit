@@ -183,6 +183,9 @@ const PromiseLimitLoop = {
           throw new Error('limit must be a number')
         }
         limit = increaseOrDecrease
+        if (increaseOrDecrease > limit) {
+          addQueue()
+        }
         return limit
       }
       if (!increaseOrDecrease) return limit
@@ -190,21 +193,30 @@ const PromiseLimitLoop = {
         throw new Error('limit must be a number')
       }
       limit += increaseOrDecrease
+      if (increaseOrDecrease > 0) {
+        addQueue()
+      }
       return limit
     }
 
+    const addQueue = () => {
+      let e: any
+      const queue = async() => {
+        return Promise.resolve(parallelFunc(handleLimit)).finally(() => {
+          executing.splice(executing.indexOf(e), 1)
+        })
+      }
+      executing.push(e = queue())
+    }
+
+    // eslint-disable-next-line no-unmodified-loop-condition
     while (limit > 0) {
       while (executing.length < limit) {
-        let e: any
-        const queue = async() => {
-          return Promise.resolve(parallelFunc(handleLimit)).finally(() => {
-            executing.splice(executing.indexOf(e), 1)
-          })
-        }
-        executing.push(e = queue())
+        addQueue()
       }
       executing.length && await Promise.race(executing)
     }
+
     await Promise.all(executing)
   },
 }
