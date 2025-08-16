@@ -1,4 +1,4 @@
-import PromiseLimitLoop = require('./index')
+import PromiseLimitLoop from './index'
 
 describe('PromiseLimitLoop', () => {
   let arr: any[]
@@ -132,5 +132,71 @@ describe('PromiseLimitLoop', () => {
         expect(limit).toBe(expectLimit)
       })
     })
+  })
+})
+
+describe('PromiseLimitLoop - function limit edge cases', () => {
+  let arr: any[]
+  beforeEach(() => {
+    arr = [...Array(10)].map((_, i) => i)
+  })
+  it('map with dynamic limit', async() => {
+    let maxExecuting = 0
+    const results = await PromiseLimitLoop.map(arr, (executing) => {
+      maxExecuting = Math.max(maxExecuting, executing.length)
+      return executing.length < 3 ? 3 : 1
+    }, item => item * 3)
+    expect(results).toEqual([...Array(10)].map((_, i) => i * 3))
+    expect(maxExecuting).toBeGreaterThanOrEqual(1)
+  })
+  it('forEach with dynamic limit', async() => {
+    let maxExecuting = 0
+    const results: any = {}
+    await PromiseLimitLoop.forEach(arr, (executing) => {
+      maxExecuting = Math.max(maxExecuting, executing.length)
+      return executing.length < 4 ? 4 : 2
+    }, (item, index) => {
+      results[index] = item * 4
+    })
+    expect(results).toEqual({ 0: 0, 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 7: 28, 8: 32, 9: 36 })
+    expect(maxExecuting).toBeGreaterThanOrEqual(2)
+  })
+  it('for with dynamic limit', async() => {
+    let maxExecuting = 0
+    const next: number[] = []
+    await PromiseLimitLoop.for(0, 9, (executing) => {
+      maxExecuting = Math.max(maxExecuting, executing.length)
+      return executing.length < 2 ? 2 : 1
+    }, index => {
+      next.push(index)
+    }, 2)
+    expect(next.sort()).toEqual([0, 2, 4, 6, 8])
+    expect(maxExecuting).toBeGreaterThanOrEqual(1)
+  })
+  it('doWhile with dynamic limit', async() => {
+    let i = 0
+    let maxExecuting = 0
+    const condition = () => i < arr.length
+    await PromiseLimitLoop.doWhile(condition, () => i++, (executing) => {
+      maxExecuting = Math.max(maxExecuting, executing.length)
+      return executing.length < 2 ? 2 : 1
+    }, resolvedFromGenerator => {
+      arr[resolvedFromGenerator] += resolvedFromGenerator
+    })
+    expect(arr).toEqual([0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
+    expect(maxExecuting).toBeGreaterThanOrEqual(1)
+  })
+  it('while with dynamic limit', async() => {
+    let i = 0
+    let maxExecuting = 0
+    const condition = () => i < arr.length
+    await PromiseLimitLoop.while(condition, () => i++, (executing) => {
+      maxExecuting = Math.max(maxExecuting, executing.length)
+      return executing.length < 2 ? 2 : 1
+    }, resolvedFromGenerator => {
+      arr[resolvedFromGenerator] += resolvedFromGenerator
+    })
+    expect(arr).toEqual([0, 2, 4, 6, 8, 10, 12, 14, 16, 18])
+    expect(maxExecuting).toBeGreaterThanOrEqual(1)
   })
 })

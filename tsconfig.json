@@ -3,7 +3,7 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "noImplicitAny": false,
-    "removeComments": true,
+    "removeComments": false,
     "preserveConstEnums": true,
     "sourceMap": false,
     "pretty": false,

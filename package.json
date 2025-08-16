@@ -4,8 +4,8 @@
   "description": "promise limit loop",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "prepack": "rm -rf dist; npm run build:clean; tsc -p tsconfig.prod.json",
+    "test": "vitest",
+    "prepack": "rm -rf dist; npm run build:clean; npx -y tsgo -p tsconfig.prod.json",
     "build:clean": "tsc --build --clean",
     "postpublish": "npm run build:clean"
   },
@@ -34,17 +34,21 @@
   ],
   "devDependencies": {
     "@cylution/eslint-config-nodejs": "^2.0.1",
-    "@types/jest": "^27.4.1",
-    "@types/node": "^16.11.11",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.19.11",
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
+    "dotenv": "^17.2.1",
     "eslint": "^8.21.0",
-    "jest": "^27.4.3",
-    "ts-jest": "^27.1.0",
+    "jest": "^30.0.5",
+    "ts-jest": "^29.4.0",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2"
   },
   "engines": {
     "node": ">=10.0.0"
+  },
+  "dependencies": {
+    "vitest": "^3.2.4"
   }
 }
